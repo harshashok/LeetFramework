@@ -1,7 +1,7 @@
 ﻿using System;
 using CommandLine;
 
-namespace RunnerFramework;
+namespace LeetFramework;
 
 
 [Verb("add", HelpText = "Add file contents to the index.")]

@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using CommandLine;
-using RunnerFramework;
+using LeetFramework;
 
 Console.WriteLine("Leet Framework");
 
@@ -18,20 +18,19 @@ static void RunOptions(AddOptions opts)
 void RunOptionsSolve(SolveOptions opts)
 {
     var allTSolvers = Assembly.GetEntryAssembly()!.GetTypes()
-    .Where(t => t.GetTypeInfo().IsClass && typeof(Solver).IsAssignableFrom(t))
-    .OrderBy(t => t.FullName)
-    .ToArray();
+        .Where(t => t.GetTypeInfo().IsClass && typeof(ISolver).IsAssignableFrom(t));
 
     // single instance. -- for POC purposes only.
-    var selectedTsolvers = allTSolvers.FirstOrDefault(tsolver => tsolver.Name.ToLower() == opts.InputFiles.First().ToLower());
-
+    //var selectedTsolvers = allTSolvers.FirstOrDefault(tsolver => tsolver.Name.ToLower() == opts.InputFiles.First().ToLower());
+    var selectedTsolvers = allTSolvers.First(solver => SolverExtensions.SolverName(solver) == opts.InputFiles.First());
+    
     //Runner.RunSolver(GetSolvers(selectedTsolvers)[0]);
     Runner.RunAll(GetSolvers(selectedTsolvers));
 }
 
-Solver?[] GetSolvers(params Type[] tsolver)
+ISolver?[] GetSolvers(params Type[] tsolver)
 {
-    return tsolver.Select(t => Activator.CreateInstance(t) as Solver).ToArray();
+    return tsolver.Select(t => Activator.CreateInstance(t) as ISolver).ToArray();
 }
 
 static void HandleParseError(IEnumerable<Error> errs)

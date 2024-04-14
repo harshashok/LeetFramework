@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Reflection;
 
-namespace RunnerFramework;
+namespace LeetFramework;
 
 class ProblemName : Attribute
 {
@@ -13,82 +12,11 @@ class ProblemName : Attribute
     }
 }
 
-interface Solver
+interface ISolver
 {
     object Solve(string input);
     object SolveAsync(string input) => null;
 }
-
-static class SolverExtensions
-{
-    public static IEnumerable<object> SolveAll(this Solver solver, string input)
-    {
-        yield return solver.Solve(input);
-        var res = solver.SolveAsync(input);
-        if (res != null)
-        {
-            yield return res;
-        }
-    }
-
-    public static string GetName(this Solver solver)
-    {
-        return (
-            solver
-                .GetType()
-                .GetCustomAttribute(typeof(ProblemName)) as ProblemName
-        ).Name;
-    }
-
-    public static string DayName(this Solver solver)
-    {
-        return $"Day {solver.Day()}";
-    }
-
-    public static int Year(this Solver solver)
-    {
-        return Year(solver.GetType());
-    }
-
-    public static int Year(Type t)
-    {
-        return int.Parse(t.FullName.Split('.')[1].Substring(1));
-    }
-    public static int Day(this Solver solver)
-    {
-        return Day(solver.GetType());
-    }
-
-    public static int Day(Type t)
-    {
-        return int.Parse(t.FullName.Split('.')[2].Substring(3));
-    }
-
-    public static string WorkingDir(int year)
-    {
-        return Path.Combine(year.ToString());
-    }
-
-    public static string WorkingDir(int year, int day)
-    {
-        return Path.Combine(WorkingDir(year), "Day" + day.ToString("00"));
-    }
-
-    public static string WorkingDir(this Solver solver)
-    {
-        return WorkingDir(solver.Year(), solver.Day());
-    }
-
-    public static string WorkingDirPath(this Solver solver)
-    {
-        var fullName = solver.GetType()?.FullName?
-            .Split('.').Skip(1).SkipLast(1);
-        var outputStr = String.Join('/', fullName);
-        return outputStr;
-
-    }
-}
-
 
 record SolverResult(string[] answers, string[] errors);
 
@@ -105,7 +33,7 @@ class Runner
         return input;
     }
 
-    public static SolverResult RunSolver(Solver solver, bool sample = false)
+    public static SolverResult RunSolver(ISolver solver, bool sample = false)
     {
 
         var workingDir = solver.WorkingDirPath();
@@ -126,10 +54,6 @@ class Runner
         foreach (var line in solver.SolveAll(input))
         {
             var ticks = stopwatch.ElapsedTicks;
-            //if (line is OcrString)
-            //{
-            //    Console.WriteLine("\n" + (line as OcrString).st.Indent(10, firstLine: true));
-            //}
             answers.Add(line.ToString());
             var (statusColor, status, err) =
                 refout == null || refout.Length <= iline ? (ConsoleColor.Cyan, "?", null) :
@@ -158,7 +82,7 @@ class Runner
         return new SolverResult(answers.ToArray(), errors.ToArray());
     }
 
-    public static void RunAll(params Solver[] solvers)
+    public static void RunAll(params ISolver[] solvers)
     {
         var errors = new List<string>();
 

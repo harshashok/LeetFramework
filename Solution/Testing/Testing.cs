@@ -1,7 +1,10 @@
 ﻿using System;
-namespace RunnerFramework.Solution.Testing
+using LeetFramework;
+
+// Testing Lack of ProblemName attribute.
+namespace LeetFramework.Solution.Testing
 {
-    public class Testing : Solver
+    public class Testing : ISolver
     {
         public object Solve(string input)
         {
