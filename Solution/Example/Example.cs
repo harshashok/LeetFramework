@@ -12,7 +12,7 @@ public class Example : ISolver
         return input.Count();
     }
 
-    public object SolveAsync(string input)
+    public object SolveLinq(string input)
     {
         return input.Split('\n')
             .Count();

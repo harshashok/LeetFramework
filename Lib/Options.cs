@@ -7,11 +7,14 @@ namespace LeetFramework;
 [Verb("add", HelpText = "Add file contents to the index.")]
 class AddOptions
 {
-    [Option('f', "files", Separator = ',', Required = true, HelpText = "Input files to be processed.")]
+    [Option('n', "name", Separator = ',', Required = true, HelpText = "Input files to be processed.")]
     public IEnumerable<string> InputFiles { get; set; }
-
+    
+    [Option('t', "title", Separator = ',', Required = true, HelpText = "Input files to be processed.")]
+    public IEnumerable<string> InputTitles { get; set; }
+    
     // Omitting long name, defaults to name of property, ie "--verbose"
-    [Option(Default = false, HelpText = "Prints all messages to standard output.")]
+    [Option("verbose", Default = false, HelpText = "Prints all messages to standard output.")]
     public bool Verbose { get; set; }
 
     [Option("no-readme", Default = false, HelpText = "Dont create readme files.")]

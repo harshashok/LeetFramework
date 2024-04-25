@@ -15,7 +15,7 @@ class ProblemName : Attribute
 interface ISolver
 {
     object Solve(string input);
-    object SolveAsync(string input) => null;
+    object SolveLinq(string input) => null;
 }
 
 record SolverResult(string[] answers, string[] errors);
