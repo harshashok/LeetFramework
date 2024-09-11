@@ -7,11 +7,11 @@ namespace LeetFramework;
 [Verb("add", HelpText = "Add file contents to the index.")]
 class AddOptions
 {
-    [Option('n', "name", Separator = ',', Required = true, HelpText = "Input files to be processed.")]
-    public IEnumerable<string> InputFiles { get; set; }
+    [Option('n', "name", Required = true, HelpText = "Input file name to be processed.")]
+    public string Name { get; set; }
     
-    [Option('t', "title", Separator = ',', Required = true, HelpText = "Input files to be processed.")]
-    public IEnumerable<string> InputTitles { get; set; }
+    [Option('t', "title", Required = true, HelpText = "Title to be used for problem generated.")]
+    public string Title { get; set; }
     
     // Omitting long name, defaults to name of property, ie "--verbose"
     [Option("verbose", Default = false, HelpText = "Prints all messages to standard output.")]
@@ -25,7 +25,7 @@ class AddOptions
 class SolveOptions
 {
     [Option('f', "files", Separator = ',', Default = true, Required = true, HelpText = "Input files to be processed.")]
-    public IEnumerable<string> InputFiles { get; set; }
+    public IEnumerable<string>? InputFiles { get; set; }
 
     // Omitting long name, defaults to name of property, ie "--verbose"
     [Option(Default = false, HelpText = "Prints all messages to standard output.")]

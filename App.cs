@@ -2,18 +2,22 @@
 using CommandLine;
 using LeetFramework;
 
-Console.WriteLine("Leet Framework");
-
 Parser.Default.ParseArguments<AddOptions, SolveOptions>(args)
 .WithParsed<AddOptions>(RunOptionsAdd)
 .WithParsed<SolveOptions>(RunOptionsSolve)
 .WithNotParsed(HandleParseError);
 
-static void RunOptionsAdd(AddOptions opts)
+void RunOptionsAdd(AddOptions opts)
 {
-    opts.InputFiles.ToList().ForEach(Console.WriteLine);
-    opts.InputTitles.ToList().ForEach(Console.WriteLine);
+    Console.WriteLine($"Name : {opts.Name}");
+    Console.WriteLine($"Title : {opts.Title}");
     Console.WriteLine("Verbose {0}", opts.Verbose.ToString());
+    Console.WriteLine($"No-Readme : {opts.NoReadMe}");
+    
+    var workingDir = Environment.CurrentDirectory + "/Solution" + $"/{opts.Name}";
+    var problem = new Problem(opts.Name, opts.Title, workingDir);
+    var solution = new SolutionTemplateGenerator(problem);
+    solution.Generate();
 }
 
 void RunOptionsSolve(SolveOptions opts)
@@ -21,20 +25,23 @@ void RunOptionsSolve(SolveOptions opts)
     var allTSolvers = Assembly.GetEntryAssembly()!.GetTypes()
         .Where(t => t.GetTypeInfo().IsClass && typeof(ISolver).IsAssignableFrom(t));
 
-    // single instance. -- for POC purposes only.
-    //var selectedTsolvers = allTSolvers.FirstOrDefault(tsolver => tsolver.Name.ToLower() == opts.InputFiles.First().ToLower());
-    var selectedTsolvers = allTSolvers.First(solver => SolverExtensions.SolverName(solver).ToLower() == opts.InputFiles.First().ToLower());
+    var selectedTsolvers = from first in allTSolvers
+        join second in opts.InputFiles 
+        on SolverExtensions.SolverName(first).ToLower() equals second.ToLower()
+        select first;
     
     //Runner.RunSolver(GetSolvers(selectedTsolvers)[0]);
     Runner.RunAll(GetSolvers(selectedTsolvers));
 }
 
-ISolver?[] GetSolvers(params Type[] tsolver)
-{
-    return tsolver.Select(t => Activator.CreateInstance(t) as ISolver).ToArray();
-}
+// ISolver?[] GetSolvers(params Type[] tsolver)
+// {
+//     return tsolver.Select(t => Activator.CreateInstance(t) as ISolver).ToArray();
+// }
+
+ISolver?[] GetSolvers(IEnumerable<Type> tsolver) => tsolver.Select(t => Activator.CreateInstance(t) as ISolver).ToArray();
 
 static void HandleParseError(IEnumerable<Error> errs)
 {
-    //handle errors.
+    Console.WriteLine($"Errors : {errs.Any()}");
 }
